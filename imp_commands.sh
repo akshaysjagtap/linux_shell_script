@@ -29,3 +29,36 @@ fi
 
 #check for service enabled
 systemctl --quiet is-enabled <service_name>
+
+# pendrive access code
+pendrive_list=""
+list=$(ls /dev/disk/by-id/usb* 2> /dev/null)
+cmd=$?
+if [ "$cmd" == "0" ];
+then
+  for mem in $list
+  do
+    path=$(readlink -f $mem 2> /dev/null)
+    cmd=$?
+    if [ "$cmd" == "0" ];
+    then
+      sudo mount $path /mnt/ 1> /dev/null 2> /dev/null
+      cmd=$?
+
+      if [ "$cmd" == "0" ] || [ "$cmd" == "32" ];
+      then
+        sudo umount $path 1> /dev/null 2> /dev/null
+        ccmd=$?
+        if [ "$ccmd" == "0" ];
+        then
+          pd=$(sudo blkid $path -o export | grep -i 'LABEL' | cut -d '=' -f 2 2> /dev/null)
+          if [ "$pd" == "" ];
+          then
+            pd=$(sudo blkid $path -o export | grep -i 'DEVNAME' | cut -d '=' -f 2 2> /dev/null)
+          fi
+          pendrive_list=$(echo $pendrive_list "$pd")
+        fi		
+      fi
+    fi	
+  done
+fi
