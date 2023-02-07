@@ -62,3 +62,9 @@ then
     fi	
   done
 fi
+
+#execute sql in shell script in postgres
+sql="select table_name"
+sql=$sql"	from information_schema.tables"
+sql=$sql"	where table_catalog='$dbname' and table_name ~ '.*_[0-9]{2}_[0-9]{2}_[0-9]{4}_[0-9]{2}_[0-9]{2}_[0-9]{2}$'"
+skip_tables=$(psql -c "COPY ($sql) to STDOUT" -U $uname -h $host -p $port -d $dbname 2> /dev/null)
