@@ -72,3 +72,5 @@ skip_tables=$(psql -c "COPY ($sql) to STDOUT" -U $uname -h $host -p $port -d $db
 #floating point calculations in shell script
 let d=500*1024*1024
 tt=$(echo "scale = 10; $all_db_size/$d" | bc)
+
+
